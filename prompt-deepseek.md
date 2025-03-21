@@ -1,7 +1,4 @@
-(Due to technical issues, the search service is temporarily unavailable.)
-
-Here's the complete enhanced prompt incorporating all requirements and best practices:
-
+Init
 ---
 
 # 🚀 Speed Tap Challenge - Vite React TypeScript PWA Starter

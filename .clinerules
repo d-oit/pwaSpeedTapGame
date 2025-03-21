@@ -26,7 +26,7 @@ file_patterns:
   - pattern: "\\.roomodes$|cline_custom_modes\\.json$"
     role: orchestrator
     description: "Mode configuration files"
-    priority: 1
+    priority: 2
 
 # Component Type Mappings
 component_types:
@@ -70,7 +70,7 @@ fallbacks:
     description: "Implementation work"
 
   - condition: "default"
-    role: orchestrator
+    role: architect
     description: "Default role for all other files"
     priority: 0  
 
