@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const ParticleSystem: React.FC<{ position: { x: number; y: number } }> = ({ position }) => {
+const ParticleSystem: React.FC<{ position: { x: number; y: number }; score: number }> = ({ position, score }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -10,8 +10,8 @@ const ParticleSystem: React.FC<{ position: { x: number; y: number } }> = ({ posi
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const particles: { x: number; y: number; vx: number; vy: number; alpha: number }[] = [];
-    const particleCount = 50;
+    const particles: { x: number; y: number; vx: number; vy: number; alpha: number; color: string }[] = [];
+    const particleCount = 50 + score * 5;
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -20,6 +20,7 @@ const ParticleSystem: React.FC<{ position: { x: number; y: number } }> = ({ posi
         vx: (Math.random() - 0.5) * 10,
         vy: (Math.random() - 0.5) * 10,
         alpha: 1,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
       });
     }
 
@@ -31,7 +32,7 @@ const ParticleSystem: React.FC<{ position: { x: number; y: number } }> = ({ posi
         particle.y += particle.vy;
         particle.alpha -= 0.01;
 
-        ctx.fillStyle = `rgba(255, 255, 255, ${particle.alpha})`;
+        ctx.fillStyle = `rgba(${particle.color}, ${particle.alpha})`;
         ctx.fillRect(particle.x, particle.y, 2, 2);
       });
 
@@ -47,7 +48,7 @@ const ParticleSystem: React.FC<{ position: { x: number; y: number } }> = ({ posi
     };
 
     animate();
-  }, [position]);
+  }, [position, score]);
 
   return <canvas ref={canvasRef} width={300} height={300} style={{ position: 'absolute', top: 0, left: 0 }} />;
 };

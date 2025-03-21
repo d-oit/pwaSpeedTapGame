@@ -13,7 +13,11 @@ export default {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   globals: {
     'ts-jest': {
-      tsconfig: 'tsconfig.json'
+      tsconfig: 'tsconfig.json',
+      diagnostics: false,
+      isolatedModules: true,
+      esModuleInterop: true,
+      jsx: 'react-jsx'
     }
   }
 };
