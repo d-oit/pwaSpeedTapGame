@@ -41,44 +41,58 @@ test('score increments on tap', () => {
 });
 ```
 
-## End-to-End (E2E) Testing
+## Integration Testing
 
 ### Objective
-Simulate real user interactions and validate the game's functionality across devices.
+Validate component interactions and game workflow scenarios using Jest and Testing Library.
 
 ### Requirements
 1. **Tools**:
-   - Use **Playwright** for cross-browser and cross-device testing.
+   - **Jest** (v29.7.0) with **ts-jest**
+   - **React Testing Library** (v16.2.0)
 
 2. **Test Coverage**:
-   - Test core user flows (e.g., starting the game, tapping the target, game over).
-   - Validate PWA features (e.g., offline mode, installability).
+   - Component rendering and state management
+   - User interaction sequences and event handling
 
-3. **Device Simulation**:
-   - Test on multiple devices (e.g., iPhone, Android, tablet) using Playwright's device emulation.
-   - Use environment variables to configure viewport sizes and device settings.
+3. **Testing Strategies**:
+   - Mock browser APIs and timers using Jest
+   - Use `@testing-library/user-event` for realistic interactions
+   - Test component snapshots for unintended changes
 
 4. **Test Cases**:
-   - **Game Flow**:
-     - Verify that the game starts and ends correctly.
-     - Ensure the score updates on each tap.
-   - **PWA Features**:
-     - Validate service worker registration and offline functionality.
-     - Test the web app manifest for correct installation behavior.
-   - **Accessibility**:
-     - Ensure touch targets are accessible and meet size requirements.
-     - Validate keyboard navigation and screen reader support.
+   - **Game Initialization**:
+     - Verify initial state (score=0, timer=30)
+     - Test target element positioning logic
+   - **User Interactions**:
+     - Complete game flow from start to game over
+     - Validate score increment and timer decrement
+   - **Edge Cases**:
+     - Test rapid consecutive taps
+     - Validate game state reset functionality
 
 ### Example Test
 ```ts
-import { test, expect } from '@playwright/test';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import GameBoard from './GameBoard';
 
-test('game starts and score updates on tap', async ({ page }) => {
-  await page.goto('/');
-  await page.click('#start-button');
-  await page.click('#target');
-  const scoreText = await page.textContent('#score');
-  expect(scoreText).toBe('1');
+test('complete game flow', async () => {
+  const user = userEvent.setup();
+  const { container } = render(<GameBoard />);
+
+  // Start game
+  await user.click(screen.getByRole('button', { name: /start game/i }));
+
+  // Test target interaction
+  const target = screen.getByTestId('moving-target');
+  await user.click(target);
+
+  // Validate score update
+  expect(screen.getByTestId('score-display')).toHaveTextContent('1');
+
+  // Verify snapshot matching
+  expect(container).toMatchSnapshot();
 });
 ```
 
