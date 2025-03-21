@@ -40,7 +40,7 @@ Responsible for implementation and maintenance of:
 ### Playwright Role
 Responsible for:
 - End-to-end test files (`.spec.ts`, `.test.ts`)
-- Playwright tests (`src/tests/`)
+- Playwright tests (`/src/tests/`)
 - Test automation and E2E testing
 
 ### Jest-Test-Engineer Role

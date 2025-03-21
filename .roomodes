@@ -26,8 +26,8 @@
         [
           "edit",
           {
-            "fileRegex": "\\.(spec|test)\\.(ts|tsx|js|jsx)$",
-            "description": "Test files only"
+            "fileRegex": "src/.*\\.(spec|test)\\.(ts|tsx|js|jsx)$",
+            "description": "Test files only within src directory"
           }
         ]
       ],
@@ -61,8 +61,8 @@
         [
           "edit",
           {
-            "fileRegex": "(__tests__/.*|__mocks__/.*|\\.test\\.(ts|tsx|js|jsx)$|/test/.*|jest\\.config\\.(js|ts)$)",
-            "description": "Test files, mocks, and Jest configuration"
+            "fileRegex": "src/(__tests__/.*|__mocks__/.*|\\.test\\.(ts|tsx|js|jsx)$|/test/.*)|jest\\.config\\.(js|ts)$",
+            "description": "Test files, mocks within src directory, and Jest configuration"
           }
         ]
       ],
