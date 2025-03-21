@@ -18,7 +18,8 @@ speed-tap-challenge/
 │   ├── hooks/ (Custom game logic)
 │   ├── styles/ (CSS Modules)
 │   ├── utils/ (Helpers/config)
-│   ├── tests/ (Jest + Playwright)
+    ├── __tests__/ (Jest)
+│   ├── tests/ (Playwright)
 │   ├── App.tsx (Root component)
 │   └── main.tsx (PWA registration)
 ├── playwright.config.ts

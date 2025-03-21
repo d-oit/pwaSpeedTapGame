@@ -1,3 +1,4 @@
+
 # Role Mappings Configuration
 
 # File Pattern Based Mappings
@@ -15,7 +16,12 @@ file_patterns:
   - pattern: "\\.(md|mdx)$|README"
     role: document-writer
     description: "Documentation files"
-    priority: 2
+    priority: 1
+
+  - pattern: "docs/.*|plans/.*"
+    role: document-writer
+    description: "Documentation directories"
+    priority: 1
 
   - pattern: "\\.roomodes$|cline_custom_modes\\.json$"
     role: orchestrator
@@ -33,16 +39,25 @@ component_types:
     description: "React hooks"
     
   - directory: "src/services"
-    role: architect
+    role: code
     description: "Service layer"
     
   - directory: "src/store"
-    role: architect
+    role: code
     description: "State management"
     
   - directory: "src/types"
-    role: architect
+    role: code
     description: "Type definitions"
+
+  - directory: "src/tests"
+    role: playwright
+    description: "Playwright tests"
+
+  - directory: "src/__tests__"
+    role:  jest-test-engineer
+    description: "Jest tests"  
+
 
 # Fallback Rules
 fallbacks:
