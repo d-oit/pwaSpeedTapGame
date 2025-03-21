@@ -1,7 +1,7 @@
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
-import GameBoard from '../../components/GameBoard';
+import GameBoard from '../components/GameBoard';
 
 describe('GameBoard Component', () => {
   test('score increments on tap', () => {

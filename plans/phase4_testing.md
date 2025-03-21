@@ -29,7 +29,7 @@ Validate individual components and game logic in isolation.
 ### Example Test
 ```ts
 import { render, fireEvent } from '@testing-library/react';
-import GameBoard from './GameBoard';
+import GameBoard from '../src/components/GameBoard';
 
 test('score increments on tap', () => {
   const { getByTestId } = render(<GameBoard />);
@@ -202,8 +202,8 @@ Ensure new changes do not break existing functionality.
 
 | Testing Type           | Tools                     | Key Metrics/Test Cases                                                                 |
 |------------------------|---------------------------|---------------------------------------------------------------------------------------|
-| **Unit Testing**       | Jest, React Testing Library | Score logic, timer logic, target movement, environment variables                      |
-| **E2E Testing**        | Playwright                | Game flow, PWA features, device simulation                                            |
+| **Unit Testing**       | Jest, React Testing Library | Score logic, timer logic, target movement (src/__tests__)                           |
+| **E2E Testing**        | Playwright                | Game flow, PWA features (src/tests/)                                                |
 | **Accessibility Testing** | axe, Lighthouse, Screen Readers | Touch target size, ARIA labels, keyboard navigation, color contrast                  |
 | **Performance Testing** | Lighthouse, Playwright    | FCP, TTI, FPS, memory usage                                                           |
 | **Cross-Browser Testing** | Playwright               | Game functionality, PWA features across Chrome, Firefox, Safari, Edge                |
