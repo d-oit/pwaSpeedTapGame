@@ -54,7 +54,7 @@ This document tracks the progress and status of the **Speed Tap Challenge** proj
   - Set up testing frameworks (Jest, Playwright).
   - Developed initial unit and E2E test cases.
 
-- **Current Focus**:
+- **Completed Tasks**:
   - Expanding test coverage.
   - Conducting accessibility and performance testing.
   - Completed unit testing for score logic, timer logic, and target movement.
@@ -66,7 +66,7 @@ This document tracks the progress and status of the **Speed Tap Challenge** proj
   - Completed all tasks for the current phase.
   - Gathered feedback and made necessary adjustments.
 
-- **Upcoming Objectives**:
+- **Current Focus**:
   - Finalize testing and validation.
   - Prepare for deployment and user feedback.
 

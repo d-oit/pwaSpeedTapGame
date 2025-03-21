@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import GameBoard from '../../components/GameBoard';
+import GameBoard from '@/components/GameBoard';
 
 test('score increments on tap', () => {
   const { getByTestId } = render(<GameBoard />);

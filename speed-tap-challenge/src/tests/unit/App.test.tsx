@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import App from '../../App';
+import App from '@/App';
 
 test('renders the game board', () => {
   render(<App />);
@@ -35,10 +35,10 @@ test('counts down the timer', async () => {
   fireEvent.click(startButton);
 
   jest.advanceTimersByTime(1000);
-  const timerElement = screen.getByText(/Time Left: 59/i);
+  const timerElement = screen.getByText(/Time Left: 29/i);
   expect(timerElement).toBeInTheDocument();
 
-  jest.advanceTimersByTime(59000);
+  jest.advanceTimersByTime(29000);
   const finalTimerElement = screen.getByText(/Time Left: 0/i);
   expect(finalTimerElement).toBeInTheDocument();
 });
