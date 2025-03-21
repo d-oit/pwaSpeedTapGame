@@ -140,6 +140,10 @@ function GameBoard() {
 
 ## Testing and Validation
 
+**Testing**:
+- Write unit tests for game logic and components.
+- Use **Playwright** for E2E testing, simulating mobile devices and touch interactions.
+
 1. **Usability Testing**:
    - Conduct usability tests with real players to identify pain points and areas for improvement.
    - Gather feedback on the overall experience and make iterative improvements.

@@ -69,6 +69,11 @@ fallbacks:
     role: code
     description: "Implementation work"
 
+  - condition: "default"
+    role: orchestrator
+    description: "Default role for all other files"
+    priority: 0  
+
 # Validation Rules
 validation:
   - rule: "no_pattern_conflicts"

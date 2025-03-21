@@ -19,6 +19,8 @@ const GameBoard: React.FC = () => {
   const handleTap = () => {
     if (isRunning) {
       setScore((score) => score + 1);
+      setParticlePosition(targetPosition);
+      setShowParticles(true);
       moveTarget();
     }
   };
@@ -66,13 +68,14 @@ const GameBoard: React.FC = () => {
         className="target"
         data-testid="target"
         onClick={handleTap}
-        style={{ transform: `translate(${targetPosition.x}px, ${targetPosition.y}px)` }}
+        style={{ transform: `translate(${targetPosition.x}px, ${targetPosition.y}px)`, fontSize: `${targetSize}em` }}
       >
         Tap Me!
       </button>
       <button className="start-button" data-testid="start-button" onClick={startGame}>
         Start Game
       </button>
+      {showParticles && <ParticleSystem position={particlePosition} />}
     </div>
   );
 };

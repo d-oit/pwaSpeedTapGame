@@ -1,0 +1,345 @@
+# Speed Tap Challenge - Jest Testing Guidelines
+
+This document outlines the coding standards and best practices for Jest testing in the Speed Tap Challenge project. Following these guidelines ensures consistent, maintainable, and effective unit testing.
+
+## Workflow Principles
+
+- **Analyze the complete codebase first before fixing any errors**
+- **Update the `/plans/status.md` after every successful task in a task list in the mode document-writer**
+- **Testing Philosophy:**
+  - Never create "special cases" in application methods to get tests to pass
+  - If fixing a test, your only two options are to fix the test or fix the underlying code issue
+  - NEVER add a "special case" to code which is only used during testing
+  - NEVER add code to product which is only used by tests
+
+## Role Responsibilities
+
+As a Jest Test Engineer, you are responsible for:
+- Unit test files (`__tests__/`, `__mocks__/`, `.test.ts`)
+- Jest tests (`src/__tests__/`)
+- Unit testing and mocking
+- Test coverage maintenance
+
+## Testing Best Practices
+
+When writing tests:
+- Always use describe/it blocks for clear test organization
+- Include meaningful test descriptions
+- Use beforeEach/afterEach for proper test isolation
+- Implement proper error cases
+- Add JSDoc comments for complex test scenarios
+- Ensure mocks are properly typed
+- Verify both positive and negative test cases
+
+## Test Structure
+
+### File Organization
+
+Organize test files according to the established structure:
+
+```
+src/
+├── __tests__/                # Root test directory
+│   ├── components/           # Component tests
+│   │   ├── GameBoard.test.tsx
+│   │   └── TargetButton.test.tsx
+│   ├── hooks/                # Hook tests
+│   │   ├── useGameLogic.test.ts
+│   │   └── useTimer.test.ts
+│   ├── services/             # Service tests
+│   │   └── scoreService.test.ts
+│   └── utils/                # Utility tests
+│       └── helpers.test.ts
+└── __mocks__/                # Mock implementations
+    ├── services/
+    │   └── scoreService.ts
+    └── utils/
+        └── localStorage.ts
+```
+
+### Test Case Structure
+
+Follow the AAA pattern (Arrange, Act, Assert) for all tests:
+
+```typescript
+// Example unit test
+test("increments score when target is tapped", () => {
+  // Arrange
+  render(<GameBoard />);
+  const target = screen.getByText(/Tap Me!/i);
+  
+  // Act
+  fireEvent.click(target);
+  
+  // Assert
+  expect(screen.getByText(/Score: 1/i)).toBeInTheDocument();
+});
+```
+
+## Testing Requirements
+
+### Component Testing
+
+Test all React components:
+- Rendering with different props
+- User interactions (clicks, inputs, etc.)
+- State changes
+- Conditional rendering
+- Error states
+
+```typescript
+describe('TargetButton', () => {
+  test('renders correctly with default props', () => {
+    render(<TargetButton position={{ x: 100, y: 100 }} onClick={jest.fn()} />);
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveStyle('left: 100px; top: 100px');
+  });
+
+  test('calls onClick when clicked', () => {
+    const handleClick = jest.fn();
+    render(<TargetButton position={{ x: 100, y: 100 }} onClick={handleClick} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+});
+```
+
+### Hook Testing
+
+Test all custom React hooks:
+- Initial state
+- State updates
+- Side effects
+- Error handling
+
+```typescript
+import { renderHook, act } from '@testing-library/react-hooks';
+import useTimer from '../hooks/useTimer';
+
+describe('useTimer', () => {
+  test('initializes with correct duration', () => {
+    const { result } = renderHook(() => useTimer(30));
+    expect(result.current.timeLeft).toBe(30);
+    expect(result.current.isActive).toBe(false);
+  });
+
+  test('decrements time when started', () => {
+    jest.useFakeTimers();
+    const { result } = renderHook(() => useTimer(30));
+    
+    act(() => {
+      result.current.startTimer();
+    });
+    
+    expect(result.current.isActive).toBe(true);
+    
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    
+    expect(result.current.timeLeft).toBe(29);
+    jest.useRealTimers();
+  });
+});
+```
+
+### Service Testing
+
+Test all service layer functions:
+- API calls (using mocks)
+- Data transformations
+- Error handling
+- Edge cases
+
+```typescript
+import scoreService from '../services/scoreService';
+import { saveScore, getHighScore } from '../utils/localStorage';
+
+jest.mock('../utils/localStorage');
+
+describe('scoreService', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('saveScore calls localStorage with correct data', () => {
+    scoreService.saveScore(100);
+    expect(saveScore).toHaveBeenCalledWith(100);
+  });
+
+  test('getHighScore returns value from localStorage', () => {
+    (getHighScore as jest.Mock).mockReturnValue(200);
+    const result = scoreService.getHighScore();
+    expect(result).toBe(200);
+    expect(getHighScore).toHaveBeenCalled();
+  });
+});
+```
+
+### Utility Testing
+
+Test all utility functions:
+- Input validation
+- Data transformations
+- Calculations
+- Edge cases
+
+```typescript
+import { calculateScore, formatTime } from '../utils/helpers';
+
+describe('helpers', () => {
+  describe('calculateScore', () => {
+    test('returns correct score based on time and hits', () => {
+      expect(calculateScore(10, 5)).toBe(50);
+      expect(calculateScore(0, 5)).toBe(0);
+      expect(calculateScore(10, 0)).toBe(0);
+    });
+  });
+
+  describe('formatTime', () => {
+    test('formats seconds correctly', () => {
+      expect(formatTime(30)).toBe('0:30');
+      expect(formatTime(65)).toBe('1:05');
+      expect(formatTime(0)).toBe('0:00');
+    });
+  });
+});
+```
+
+## Mocking
+
+### Mock Implementation
+
+Create proper mock implementations:
+- Mock external dependencies
+- Mock browser APIs
+- Mock timers for time-dependent tests
+
+```typescript
+// __mocks__/utils/localStorage.ts
+export const saveScore = jest.fn();
+export const getHighScore = jest.fn().mockReturnValue(0);
+export const clearScores = jest.fn();
+
+// In tests
+jest.mock('../utils/localStorage');
+```
+
+### Timer Mocking
+
+Use Jest's timer mocks for time-dependent tests:
+
+```typescript
+describe('Timer component', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('counts down correctly', () => {
+    render(<Timer duration={30} onComplete={jest.fn()} />);
+    
+    // Fast-forward time
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    
+    expect(screen.getByText('0:29')).toBeInTheDocument();
+  });
+});
+```
+
+### API Mocking
+
+Mock API calls using Jest's mock functions:
+
+```typescript
+import { fetchScores } from '../services/api';
+
+jest.mock('../services/api');
+
+describe('Leaderboard component', () => {
+  test('displays scores from API', async () => {
+    const mockScores = [
+      { name: 'Player 1', score: 100 },
+      { name: 'Player 2', score: 90 }
+    ];
+    
+    (fetchScores as jest.Mock).mockResolvedValue(mockScores);
+    
+    render(<Leaderboard />);
+    
+    // Wait for scores to load
+    await screen.findByText('Player 1');
+    
+    expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getByText('Player 2')).toBeInTheDocument();
+    expect(screen.getByText('90')).toBeInTheDocument();
+  });
+});
+```
+
+## Code Coverage
+
+### Coverage Requirements
+
+- Maintain a minimum code coverage of 90% for all files
+- Focus on testing business logic and user interactions
+- Run coverage reports regularly with `npm test -- --coverage`
+
+### Coverage Reporting
+
+Configure Jest to generate coverage reports:
+
+```json
+// jest.config.js
+module.exports = {
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/index.tsx",
+    "!src/reportWebVitals.ts"
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90
+    }
+  }
+}
+```
+
+## Snapshot Testing
+
+Use snapshot testing for UI components:
+
+```typescript
+describe('GameBoard', () => {
+  test('matches snapshot', () => {
+    const { container } = render(<GameBoard />);
+    expect(container).toMatchSnapshot();
+  });
+});
+```
+
+## Integration with CI/CD
+
+- Configure Jest tests to run in CI/CD pipeline
+- Fail the build if tests fail or coverage drops below threshold
+- Generate and publish test reports
+
+---
+
+By following these guidelines, we ensure that our Jest tests are reliable, maintainable, and effective at catching regressions before they reach production.
+
+**Important Reminders:**
+1. Analyze the complete codebase first before fixing any errors
+2. Update the `/plans/status.md` after every successful task in a task list in the mode document-writer
+3. Never create special cases in code just to make tests pass

@@ -11,6 +11,10 @@ The purpose of the **Speed Tap Challenge** project is to create a **mobile-respo
 6. **Mobile-First Design**: Prioritizing responsive and accessible design for a seamless experience across devices.
 
 ### Key Objectives
+
+**Testing**:
+- Write unit tests for game logic and components.
+- Use **Playwright** for E2E testing, simulating mobile devices and touch interactions.
 - **Game Mechanics**:
   - Players tap a target to score points.
   - The target moves randomly after each tap.

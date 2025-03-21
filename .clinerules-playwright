@@ -1,0 +1,378 @@
+## Workflow Principles
+
+- **Analyze the complete codebase first before fixing any errors**
+- **Update the `/plans/status.md` after every successful task in a task list in the mode document-writer**
+- **Testing Philosophy:**
+  - Never create "special cases" in application methods to get tests to pass
+  - If fixing a test, your only two options are to fix the test or fix the underlying code issue
+  - NEVER add a "special case" to code which is only used during testing
+  - NEVER add code to product which is only used by tests
+
+## Role Responsibilities
+
+As a Playwright tester, you are responsible for:
+- End-to-end test files (`.spec.ts`, `.test.ts`)
+- Playwright tests (`src/tests/`)
+- Test automation and E2E testing
+- Cross-browser and cross-device testing
+- PWA feature validation
+
+## Environment Configuration
+
+### Dedicated Test Environment
+
+Use a dedicated `.env.test` file for testing-specific variables:
+
+```env
+# Testing Configuration
+PLAYWRIGHT_BASE_URL=http://localhost:3000
+PLAYWRIGHT_VIEWPORT_WIDTH=375
+PLAYWRIGHT_VIEWPORT_HEIGHT=667
+PLAYWRIGHT_DEVICE_NAME="iPhone 13 Pro"
+PLAYWRIGHT_HEADLESS=true
+PLAYWRIGHT_TIMEOUT=30000
+```
+
+### Playwright Configuration
+
+Create a properly configured `playwright.config.ts`:
+
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.test' });
+
+export default defineConfig({
+  use: {
+    baseURL: process.env.PLAYWRIGHT_BASE_URL,
+    viewport: {
+      width: Number(process.env.PLAYWRIGHT_VIEWPORT_WIDTH),
+      height: Number(process.env.PLAYWRIGHT_VIEWPORT_HEIGHT),
+    },
+    deviceScaleFactor: 2,
+    isMobile: true,
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'mobile-chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'mobile-safari',
+      use: { ...devices['iPhone 13 Pro'] },
+    },
+  ],
+});
+```
+
+## Test Matrix
+
+Follow the E2E Test Matrix for device testing:
+
+| Scenario              | Playwright Config          |
+|-----------------------|----------------------------|
+| iOS Portrait          | iPhone 13 Pro, headless    |
+| Android Landscape     | Pixel 5, viewport 850x400  | 
+| Tablet                | iPad Pro 12.9              |
+
+## Test Structure
+
+### File Organization
+
+Organize test files according to the established structure:
+
+```
+src/
+└── tests/
+    ├── game-flow/
+    │   ├── start-game.spec.ts
+    │   ├── score-update.spec.ts
+    │   └── game-over.spec.ts
+    ├── pwa/
+    │   ├── offline.spec.ts
+    │   ├── install.spec.ts
+    │   └── service-worker.spec.ts
+    ├── accessibility/
+    │   ├── keyboard-nav.spec.ts
+    │   └── screen-reader.spec.ts
+    ├── performance/
+    │   ├── load-time.spec.ts
+    │   └── fps.spec.ts
+    └── cross-browser/
+        ├── chrome.spec.ts
+        ├── firefox.spec.ts
+        └── safari.spec.ts
+```
+
+### Test Case Structure
+
+Follow the AAA pattern (Arrange, Act, Assert) for all tests:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('game starts and score updates on tap', async ({ page }) => {
+  // Arrange
+  await page.goto('/');
+  
+  // Act
+  await page.click('#start-button');
+  await page.click('#target');
+  
+  // Assert
+  const scoreText = await page.textContent('#score');
+  expect(scoreText).toBe('1');
+});
+```
+
+## Testing Requirements
+
+### Game Flow Testing
+
+Test all core game functionality:
+- Game starts correctly
+- Score updates on tap
+- Timer counts down
+- Game ends when timer reaches zero
+- High score is recorded
+
+```typescript
+test('game ends when timer reaches zero', async ({ page }) => {
+  await page.goto('/');
+  await page.click('#start-button');
+  
+  // Wait for game to end (timer to reach zero)
+  await page.waitForSelector('.game-over', { timeout: 35000 });
+  
+  // Verify game over state
+  expect(await page.isVisible('.game-over')).toBeTruthy();
+});
+```
+
+### PWA Testing
+
+Verify all PWA features:
+- Service worker registration
+- Offline functionality
+- Web app manifest
+- Installability
+
+```typescript
+test('app works offline', async ({ page }) => {
+  // Load the app
+  await page.goto('/');
+  
+  // Wait for service worker to be installed
+  await page.waitForFunction(() => navigator.serviceWorker.ready);
+  
+  // Simulate offline mode
+  await page.context().setOffline(true);
+  
+  // Reload the page
+  await page.reload();
+  
+  // Verify the app still works
+  expect(await page.isVisible('#start-button')).toBeTruthy();
+});
+```
+
+### Cross-Browser Testing
+
+Test on multiple browsers:
+- Chrome
+- Firefox
+- Safari
+- Edge
+
+```typescript
+test('game works on all browsers', async ({ page, browserName }) => {
+  test.info().annotations.push({ type: 'browser', description: browserName });
+  
+  await page.goto('/');
+  await page.click('#start-button');
+  await page.click('#target');
+  
+  const scoreText = await page.textContent('#score');
+  expect(scoreText).toBe('1');
+});
+```
+
+### Device Testing
+
+Test on multiple device types:
+- Desktop
+- Mobile (iOS and Android)
+- Tablet
+
+```typescript
+test('game adapts to different screen sizes', async ({ page, isMobile }) => {
+  await page.goto('/');
+  
+  if (isMobile) {
+    // Verify mobile-specific UI elements
+    expect(await page.isVisible('.mobile-controls')).toBeTruthy();
+  } else {
+    // Verify desktop-specific UI elements
+    expect(await page.isVisible('.desktop-controls')).toBeTruthy();
+  }
+});
+```
+
+### Accessibility Testing
+
+Test accessibility features:
+- Keyboard navigation
+- Screen reader support
+- Color contrast
+- Touch target size
+
+```typescript
+test('game can be played with keyboard', async ({ page }) => {
+  await page.goto('/');
+  
+  // Start game with Enter key
+  await page.keyboard.press('Enter');
+  
+  // Play game with Space key
+  await page.keyboard.press('Space');
+  
+  // Verify score updates
+  const scoreText = await page.textContent('#score');
+  expect(scoreText).toBe('1');
+});
+```
+
+### Performance Testing
+
+Test performance metrics:
+- Load time
+- First Contentful Paint (FCP)
+- Time to Interactive (TTI)
+- Frames per second (FPS)
+
+```typescript
+test('load time is within limits', async ({ page }) => {
+  await page.goto('/');
+  
+  const loadTime = await page.evaluate(() => {
+    return window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+  });
+  
+  expect(loadTime).toBeLessThan(1500); // 1.5 seconds
+});
+```
+
+## Best Practices
+
+### Test Isolation
+
+- Each test should be independent and not rely on the state from previous tests
+- Reset application state before each test
+- Use unique test data to avoid conflicts
+
+### Reliable Selectors
+
+- Use data-testid attributes for test selectors
+- Avoid using CSS selectors that might change with styling updates
+- Prefer role-based selectors for accessibility testing
+
+```typescript
+// ✅ Good
+await page.click('[data-testid="target"]');
+
+// ❌ Bad
+await page.click('.game-target-button');
+```
+
+### Waiting Strategies
+
+- Use explicit waiting strategies instead of arbitrary timeouts
+- Wait for specific elements or conditions rather than fixed time periods
+- Handle async operations properly
+
+```typescript
+// ✅ Good
+await page.waitForSelector('[data-testid="score"]');
+
+// ❌ Bad
+await page.waitForTimeout(1000);
+```
+
+### Error Handling
+
+- Add descriptive error messages to assertions
+- Use try/catch blocks for complex test scenarios
+- Take screenshots on test failures for debugging
+
+### Visual Testing
+
+- Use Playwright's screenshot comparison for visual regression testing
+- Capture screenshots at key points in the game flow
+- Compare screenshots across different browsers and devices
+
+```typescript
+test('game UI matches design', async ({ page }) => {
+  await page.goto('/');
+  
+  // Take screenshot of the game start screen
+  await expect(page).toHaveScreenshot('game-start.png');
+  
+  await page.click('#start-button');
+  
+  // Take screenshot of the active game
+  await expect(page).toHaveScreenshot('game-active.png');
+});
+```
+
+## CI/CD Integration
+
+- Run Playwright tests in CI/CD pipeline
+- Configure GitHub Actions or similar CI system to run tests on pull requests
+- Generate and publish test reports
+- Fail the build if tests fail
+
+---
+
+By following these guidelines, we ensure that our Playwright tests are reliable, maintainable, and effective at catching regressions before they reach production.
+
+**Important Reminders:**
+1. Analyze the complete codebase first before fixing any errors
+2. Update the `/plans/status.md` after every successful task in a task list in the mode document-writer
+3. Never create special cases in code just to make tests pass
+````
+
+The updated Playwright role guidelines now include:
+
+1. Comprehensive responsibilities for the Playwright role
+2. Detailed environment configuration with examples
+3. Test matrix for device testing
+4. Structured organization for test files
+5. Specific testing requirements for:
+   - Game flow
+   - PWA features
+   - Cross-browser compatibility
+   - Device compatibility
+   - Accessibility
+   - Performance
+6. Best practices for:
+   - Test isolation
+   - Selector strategies
+   - Waiting strategies
+   - Error handling
+   - Visual testing
+7. CI/CD integration guidelines
+8. The important workflow principles you specified
