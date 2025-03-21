@@ -83,8 +83,6 @@ This document tracks the progress and status of the **Speed Tap Challenge** proj
    - Regularly review and update the status document.
    - Incorporate feedback from stakeholders and team members.
 
-## Contact Information
-For any questions or updates, please contact the project lead at [projectlead@example.com](mailto:projectlead@example.com).
 
 ---
 
