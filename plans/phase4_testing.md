@@ -2,6 +2,38 @@
 
 ## Unit Testing
 
+### TypeScript Type Assertions
+When using TypeScript, ensure proper type assertions to avoid errors like TS2749. Use `typeof` for type assertions.
+
+```typescript
+import { render, fireEvent } from '@testing-library/react';
+import GameBoard from '../src/components/GameBoard';
+
+test('score increments on tap', () => {
+  const { getByTestId } = render(<GameBoard />);
+  const target = getByTestId('target');
+  const scoreDisplay = getByTestId('score');
+
+  fireEvent.pointerDown(target);
+  expect(scoreDisplay.textContent).toBe('1');
+});
+```
+
+### Example Test with Type Assertions
+```typescript
+import { render, fireEvent } from '@testing-library/react';
+import GameBoard from '../src/components/GameBoard';
+
+test('score increments on tap', () => {
+  const { getByTestId } = render(<GameBoard />);
+  const target = getByTestId('target');
+  const scoreDisplay = getByTestId('score');
+
+  fireEvent.pointerDown(target);
+  expect(scoreDisplay.textContent).toBe('1');
+});
+```
+
 ### Objective
 Validate individual components and game logic in isolation.
 

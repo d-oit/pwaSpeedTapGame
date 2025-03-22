@@ -15,7 +15,8 @@ This document outlines the coding standards and best practices for Jest testing 
 ## Role Responsibilities
 
 As a Jest Test Engineer, you are responsible for:
-- Unit test files (`__tests__/`, `__mocks__/`, `.test.ts`)
+- Use folder (`src/__tests__/`)
+- Unit test files (`src/__tests__/`, `src/__mocks__/`, `.test.ts`)
 - Jest tests (`src/__tests__/`)
 - Unit testing and mocking
 - Test coverage maintenance
