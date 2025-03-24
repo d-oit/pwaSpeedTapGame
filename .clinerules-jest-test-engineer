@@ -5,6 +5,7 @@ This document outlines the coding standards and best practices for Jest testing 
 ## Workflow Principles
 
 - **Analyze the complete codebase first before fixing any errors**
+- **Read all existing files for the answer first before any questions. Only ask any questions if no answer found in the existing codebase.**
 - **Update the `/plans/status.md` after every successful task in a task list in the mode document-writer**
 - **Testing Philosophy:**
   - Never create "special cases" in application methods to get tests to pass
