@@ -1,4 +1,3 @@
-
 # Role Mappings Configuration
 
 # File Pattern Based Mappings
@@ -58,7 +57,6 @@ component_types:
     role: jest-test-engineer
     description: "Jest tests"
 
-
 # Fallback Rules
 fallbacks:
   - condition: "new_feature"
@@ -89,6 +87,27 @@ validation:
   - rule: "fallback_required"
     description: "Every scenario must have a fallback role"
 
+  - rule: "llm_output_deduplication"
+    description: "If LLM API generates repetitive outputs, escalate to architect"
+    strategies:
+      - name: "token_similarity"
+        description: "Compare output tokens using cosine/Jaccard similarity"
+        threshold: 0.90
+      - name: "ngram_overlap"
+        description: "Detect repeated word sequences"
+        ngram_size: 5
+        threshold: 0.80
+      - name: "semantic_similarity"
+        description: "Compare embeddings of outputs"
+        model: "sentence-transformers"
+        threshold: 0.85
+      - name: "pattern_matching"
+        description: "Direct pattern/structure matching"
+        techniques:
+          - "regex patterns"
+          - "AST comparison"
+          - "string matching"
+
 # Mode Capabilities
 capabilities:
   playwright:
@@ -110,11 +129,65 @@ capabilities:
   architect:
     - "system_design"
     - "technical_planning"
+    - "llm_optimization"
     
   code:
     - "implementation"
     - "maintenance"
+    - "output_monitoring"
 
   designer:
     - "ui/ux design"
-    - "mockups"  
+    - "mockups"
+
+# Escalations
+escalations:
+  - trigger: "llm_repetition_detected"
+    from_role: "code"
+    to_role: "architect"
+    action: "Request architectural guidance for LLM output optimization"
+    description: "When LLM generates repetitive content"
+    detection:
+      methods:
+        - type: "token_similarity"
+          threshold: 0.90
+          action: "Compare new outputs with session history"
+        - type: "ngram_analysis"
+          ngram_size: 5
+          threshold: 0.80
+          action: "Check for repeated word sequences"
+        - type: "semantic_comparison"
+          model: "sentence-transformers"
+          threshold: 0.85
+          action: "Compare semantic meaning of outputs"
+        - type: "pattern_detection"
+          techniques:
+            - "regex matching"
+            - "AST parsing"
+            - "string similarity"
+          action: "Identify structural repetition"
+    resolution:
+      steps:
+        - "Analyze repetition patterns"
+        - "Adjust prompts or generation strategy"
+        - "Update context management"
+        - "Refine similarity thresholds"
+
+# Output Management
+output_tracking:
+  session_history:
+    enabled: true
+    max_entries: 100
+  similarity_checks:
+    enabled: true
+    methods:
+      - "token_based"
+      - "semantic"
+      - "structural"
+  deduplication:
+    enabled: true
+    strategy: "intelligent"
+    thresholds:
+      token_similarity: 0.90
+      semantic_similarity: 0.85
+      pattern_match: 0.80
